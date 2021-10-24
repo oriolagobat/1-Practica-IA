@@ -304,7 +304,7 @@ class CornersProblem(search.SearchProblem):
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        return (self.startingPosition, tuple())
+        return self.startingPosition, frozenset()
 
     def isGoalState(self, state):
         """
@@ -348,7 +348,7 @@ class CornersProblem(search.SearchProblem):
                         new_corners.add(c)  # Ho fem en un conjunt així ni que estigui a dins no el posem per duplicat
                         break
 
-                succ = (new_pos, tuple(new_corners))
+                succ = (new_pos, frozenset(new_corners))
                 successors.append((succ, action, 1))
                 print(succ)
         self._expanded += 1  # DO NOT CHANGE
