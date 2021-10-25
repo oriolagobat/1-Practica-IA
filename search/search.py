@@ -18,6 +18,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+import sys
 from node import Node
 
 
@@ -77,74 +78,105 @@ def tinyMazeSearch(problem):
 
 def depthFirstSearch(problem):
     """Search the deepest nodes in the search tree first."""
-    fringe = util.NodeStack()
-    expanded = util.NodeStack()
+    initial = Node(problem.getStartState())
+    if problem.isGoalState(problem.getStartState()):
+        return initial.total_path()
 
-    inicial = Node(problem.getStartState())
-    fringe.push(inicial)
+    fringe = util.Stack()
+    fringe.push(initial)
+    generated = set()
 
-    while True:
-        if fringe.isEmpty():
-            return None
-
+    while not fringe.isEmpty():
         n = fringe.pop()
-        expanded.push(n)
+        generated.add(n.state)
 
         for state, action, cost in problem.getSuccessors(n.state):
-            node_successor = Node(state, n, action, cost)
-            if not fringe.has_state(node_successor.state) and not expanded.has_state(node_successor.state):
-                if problem.isGoalState(node_successor.state):
-                    return node_successor.total_path()
-                fringe.push(node_successor)
+            succ_node = Node(state, n, action, n.cost + cost)
+            if succ_node.state not in generated:
+                if problem.isGoalState(succ_node.state):
+                    return succ_node.total_path()
+                fringe.push(succ_node)
+                generated.add(succ_node.state)
+
+    print("No solution")
+    sys.exit(-1)
 
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
-    fringe = util.NodeQueue()
-    expanded = util.NodeQueue()
+    initial = Node(problem.getStartState())
+    if problem.isGoalState(problem.getStartState()):
+        return initial.total_path()
 
-    inicial = Node(problem.getStartState())
-    fringe.push(inicial)
+    fringe = util.Queue()
+    fringe.push(initial)
+    generated = set()
+    generated.add(n.state)  # Expanded,
+    # Ho posem aquí perque aquesta línia és només útil pel primer node, si no estaria després del pop
 
-    while True:
-        if fringe.isEmpty():
-            return None
-
+    while not fringe.isEmpty():
         n = fringe.pop()
-        expanded.push(n)
 
         for state, action, cost in problem.getSuccessors(n.state):
-            node_successor = Node(state, n, action, cost)
-            if not fringe.has_state(node_successor.state) and not expanded.has_state(node_successor.state):
-                if problem.isGoalState(node_successor.state):
-                    return node_successor.total_path()
-                fringe.push(node_successor)
+            succ_node = Node(state, n, action, n.cost + cost)
+            if succ_node.state not in generated:  # Not in expanded and not in Fringe
+                if problem.isGoalState(succ_node.state):
+                    return succ_node.total_path()
+                fringe.push(succ_node)
+                generated.add(succ_node.state)  # Fringe
+
+    print("No solution")
+    sys.exit(-1)
 
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
-    fringe = util.NodePriorityQueue()
-    expanded = util.NodeQueue()
+    # fringe = util.NodePriorityQueue()
+    # generated = set()
+    #
+    # inicial = Node(problem.getStartState())
+    # if problem.isGoalState(problem.getStartState()):
+    #     return inicial.total_path()
+    # fringe.push(inicial, 0)
+    #
+    # while True:
+    #     if fringe.isEmpty():
+    #         return None
+    #     n = fringe.pop()
+    #
+    #     if problem.isGoalState(n.state):
+    #         return n.total_path()
+    #     expanded.push(n)
+    #
+    #     for state, action, cost in problem.getSuccessors(n.state):
+    #         node_successor = Node(state, n, action, n.cost + cost)
+    #         if not fringe.has_state(node_successor.state) and \
+    #                 not expanded.has_state(node_successor.state):
+    #             fringe.push(node_successor, node_successor.cost)
+    #         elif fringe.has_node_with_higher_cost(node_successor):
+    #             fringe.update(node_successor, node_successor.cost)
+    initial = Node(problem.getStartState())
+    if problem.isGoalState(problem.getStartState()):
+        return initial.total_path()
 
-    inicial = Node(problem.getStartState())
-    fringe.push(inicial, 0)
+    fringe = util.Queue()
+    fringe.push(initial)
+    generated = set()
 
-    while True:
-        if fringe.isEmpty():
-            return None
+    while not fringe.isEmpty():
         n = fringe.pop()
-
-        if problem.isGoalState(n.state):
-            return n.total_path()
-        expanded.push(n)
+        generated.add(n.state)
 
         for state, action, cost in problem.getSuccessors(n.state):
-            node_successor = Node(state, n, action, n.cost + cost)
-            if not fringe.has_state(node_successor.state) and \
-                    not expanded.has_state(node_successor.state):
-                fringe.push(node_successor, node_successor.cost)
-            elif fringe.has_node_with_higher_cost(node_successor):
-                fringe.update(node_successor, node_successor.cost)
+            succ_node = Node(state, n, action, n.cost + cost)
+            if succ_node.state not in generated:
+                if problem.isGoalState(succ_node.state):
+                    return succ_node.total_path()
+                fringe.push(succ_node)
+                generated.add(succ_node.state)
+
+    print("No solution")
+    sys.exit(-1)
 
 
 def nullHeuristic(state, problem=None):
@@ -161,6 +193,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     expanded = util.NodeQueue()
 
     inicial = Node(problem.getStartState())
+    if problem.isGoalState(problem.getStartState()):
+        return inicial.total_path()
     fringe.push(inicial, 0)
 
     while True:
@@ -179,7 +213,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 fringe.push(node_successor, node_successor.cost)
             elif fringe.has_node_with_higher_cost(node_successor):
                 fringe.update(node_successor, node_successor.cost)
-
 
 # Abbreviations
 bfs = breadthFirstSearch
