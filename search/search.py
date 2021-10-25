@@ -85,11 +85,10 @@ def depthFirstSearch(problem):
     fringe = util.Stack()
     fringe.push(initial)
     generated = set()
+    generated.add(initial.state)
 
     while not fringe.isEmpty():
         n = fringe.pop()
-        generated.add(n.state)
-
         for state, action, cost in problem.getSuccessors(n.state):
             succ_node = Node(state, n, action, n.cost + cost)
             if succ_node.state not in generated:
@@ -111,7 +110,7 @@ def breadthFirstSearch(problem: SearchProblem):
     fringe = util.Queue()
     fringe.push(initial)
     generated = set()
-    generated.add(n.state)  # Expanded,
+    generated.add(initial.state)  # Expanded,
     # Ho posem aquí perque aquesta línia és només útil pel primer node, si no estaria després del pop
 
     while not fringe.isEmpty():
@@ -131,49 +130,31 @@ def breadthFirstSearch(problem: SearchProblem):
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
-    # fringe = util.NodePriorityQueue()
-    # generated = set()
-    #
-    # inicial = Node(problem.getStartState())
-    # if problem.isGoalState(problem.getStartState()):
-    #     return inicial.total_path()
-    # fringe.push(inicial, 0)
-    #
-    # while True:
-    #     if fringe.isEmpty():
-    #         return None
-    #     n = fringe.pop()
-    #
-    #     if problem.isGoalState(n.state):
-    #         return n.total_path()
-    #     expanded.push(n)
-    #
-    #     for state, action, cost in problem.getSuccessors(n.state):
-    #         node_successor = Node(state, n, action, n.cost + cost)
-    #         if not fringe.has_state(node_successor.state) and \
-    #                 not expanded.has_state(node_successor.state):
-    #             fringe.push(node_successor, node_successor.cost)
-    #         elif fringe.has_node_with_higher_cost(node_successor):
-    #             fringe.update(node_successor, node_successor.cost)
     initial = Node(problem.getStartState())
     if problem.isGoalState(problem.getStartState()):
         return initial.total_path()
 
-    fringe = util.Queue()
-    fringe.push(initial)
-    generated = set()
+    fringe = util.NodePriorityQueue()
+    generated = {}
+    fringe.push(initial, 0)
+    generated[initial.state] = ("F", 0)
 
     while not fringe.isEmpty():
         n = fringe.pop()
-        generated.add(n.state)
-
+        if problem.isGoalState(n.state):
+            return n.total_path()
+        if generated[n.state][0] == "E":
+            # Passa a la següent iteració del bucle
+            continue
+        generated[n.state] = ("E", n.cost)
         for state, action, cost in problem.getSuccessors(n.state):
             succ_node = Node(state, n, action, n.cost + cost)
             if succ_node.state not in generated:
-                if problem.isGoalState(succ_node.state):
-                    return succ_node.total_path()
-                fringe.push(succ_node)
-                generated.add(succ_node.state)
+                fringe.push(succ_node, succ_node.cost)
+                generated[succ_node.state] = ("F", succ_node.cost)
+            elif generated[succ_node.state][0] == 'F' and generated[succ_node.state][1] > succ_node.cost:
+                fringe.update(succ_node, succ_node.cost)
+                generated[succ_node.state] = ("F", succ_node.cost)
 
     print("No solution")
     sys.exit(-1)
@@ -213,6 +194,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 fringe.push(node_successor, node_successor.cost)
             elif fringe.has_node_with_higher_cost(node_successor):
                 fringe.update(node_successor, node_successor.cost)
+
 
 # Abbreviations
 bfs = breadthFirstSearch
