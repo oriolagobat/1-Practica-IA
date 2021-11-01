@@ -130,35 +130,7 @@ def breadthFirstSearch(problem: SearchProblem):
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
-    # initial = Node(problem.getStartState())
-    # if problem.isGoalState(problem.getStartState()):
-    #     return initial.total_path()
-    #
-    # fringe = util.NodePriorityQueue()
-    # generated = {}
-    # fringe.push(initial, 0)
-    # generated[initial.state] = ("F", 0)
-    #
-    # while not fringe.isEmpty():
-    #     n = fringe.pop()
-    #     if problem.isGoalState(n.state):
-    #         return n.total_path()
-    #     if generated[n.state][0] == "E":
-    #         # Passa a la següent iteració del bucle
-    #         continue
-    #     generated[n.state] = ("E", n.cost)
-    #     for state, action, cost in problem.getSuccessors(n.state):
-    #         succ_node = Node(state, n, action, n.cost + cost)
-    #         if succ_node.state not in generated:
-    #             fringe.push(succ_node, succ_node.cost)
-    #             generated[succ_node.state] = ("F", succ_node.cost)
-    #         elif generated[succ_node.state][0] == 'F' and generated[succ_node.state][1] > succ_node.cost:
-    #             fringe.update(succ_node, succ_node.cost)
-    #             generated[succ_node.state] = ("F", succ_node.cost)
-    #
-    # print("No solution")
-    # sys.exit(-1)
-    aStarSearch(problem, nullHeuristic)
+    return aStarSearch(problem)
 
 
 def nullHeuristic(state, problem=None):
@@ -189,9 +161,9 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
             continue
         generated[n.state] = ("E", n.cost)
         for state, action, cost in problem.getSuccessors(n.state):
-            succ_node = Node(state, n, action, n.cost + cost + heuristic(state, problem))
+            succ_node = Node(state, n, action, n.cost + cost)
             if succ_node.state not in generated:
-                fringe.push(succ_node, succ_node.cost)
+                fringe.push(succ_node, succ_node.cost + heuristic(state, problem))
                 generated[succ_node.state] = ("F", succ_node.cost)
             elif generated[succ_node.state][0] == 'F' and generated[succ_node.state][1] > succ_node.cost:
                 fringe.update(succ_node, succ_node.cost)

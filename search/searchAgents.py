@@ -293,11 +293,10 @@ class CornersProblem(search.SearchProblem):
         self.corners = ((1, 1), (1, top), (right, 1), (right, top))
         for corner in self.corners:
             if not startingGameState.hasFood(*corner):
-                print('Warning: no food in corner ' + str(corner))
+                print('Warning: No food in corner ' + str(corner))
         self._expanded = 0  # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        "*** YOUR CODE HERE ***"
 
     def getStartState(self):
         """
@@ -330,7 +329,7 @@ class CornersProblem(search.SearchProblem):
         """
 
         cur_pos, corners = state
-        x,y = cur_pos
+        x, y = cur_pos
 
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
@@ -350,7 +349,6 @@ class CornersProblem(search.SearchProblem):
 
                 succ = (new_pos, frozenset(new_corners))
                 successors.append((succ, action, 1))
-                print(succ)
         self._expanded += 1  # DO NOT CHANGE
         return successors
 
@@ -384,8 +382,45 @@ def cornersHeuristic(state, problem):
     corners = problem.corners  # These are the corner coordinates
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
-    "*** YOUR CODE HERE ***"
-    return 0  # Default to trivial solution
+    pes = 1
+    heuristics = []
+    position, visited = state
+    new_pos = list(position)
+    for corner in corners:
+        if corner not in visited:  # Ens falta aquest corner
+            heuristics += [abs(position[0] - corner[0]) + abs(position[1] - corner[1]) + numberOfMuros(new_pos, corner,
+                                                                                                       walls.data) * pes]
+    if heuristics:
+        return min(heuristics)
+    return 0
+
+
+def numberOfMuros(position, corner, walls_p):
+    muros = 0
+    dx = updateIncrements(position[0], corner[0])
+    dy = updateIncrements(position[1], corner[1])
+
+    while position[0] is not corner[0] or position[1] is not corner[1]:
+        if dx is not 0:
+            position[0] += dx
+            if walls_p[position[0]][position[1]]:
+                muros += 1
+        if dy is not 0:
+            position[1] += dy
+            if walls_p[position[0]][position[1]]:
+                muros += 1
+
+    return muros
+
+
+def updateIncrements(position, corner):
+    if position < corner:
+        incr = 1
+    elif position == corner:
+        incr = 0
+    else:
+        incr = -1
+    return incr
 
 
 class AStarCornersAgent(SearchAgent):
