@@ -382,35 +382,15 @@ def cornersHeuristic(state, problem):
     corners = problem.corners  # These are the corner coordinates
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
-    pes = 1
     heuristics = []
     position, visited = state
     new_pos = list(position)
     for corner in corners:
         if corner not in visited:  # Ens falta aquest corner
-            heuristics += [abs(position[0] - corner[0]) + abs(position[1] - corner[1]) + numberOfMuros(new_pos, corner,
-                                                                                                       walls.data) * pes]
+            heuristics += [abs(position[0] - corner[0]) + abs(position[1] - corner[1])]
     if heuristics:
-        return min(heuristics)
+        return max(heuristics)
     return 0
-
-
-def numberOfMuros(position, corner, walls_p):
-    muros = 0
-    dx = updateIncrements(position[0], corner[0])
-    dy = updateIncrements(position[1], corner[1])
-
-    while position[0] is not corner[0] or position[1] is not corner[1]:
-        if dx is not 0:
-            position[0] += dx
-            if walls_p[position[0]][position[1]]:
-                muros += 1
-        if dy is not 0:
-            position[1] += dy
-            if walls_p[position[0]][position[1]]:
-                muros += 1
-
-    return muros
 
 
 def updateIncrements(position, corner):
