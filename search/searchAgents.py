@@ -382,6 +382,9 @@ def cornersHeuristic(state, problem):
     corners = problem.corners  # These are the corner coordinates
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
+    if problem.isGoalState(state):
+        return 0
+
     heuristics = []
     position, visited = state
     new_pos = list(position)
@@ -389,6 +392,7 @@ def cornersHeuristic(state, problem):
         if corner not in visited:  # Ens falta aquest corner
             heuristics += [abs(position[0] - corner[0]) + abs(position[1] - corner[1])]
     if heuristics:
+        # return max(heuristics) + (len(corners) - len(visited))
         return max(heuristics)
     return 0
 
@@ -504,11 +508,25 @@ def foodHeuristic(state, problem = FoodSearchProblem):
     if problem.isGoalState(state):
         return 0
     heuristics = []
-    for coord in foodGrid:
+    for coord in foodGrid.asList():
+        # print(position)
+        # print(coord)
+        # heuristics += mazeDistance(position, coord, state)
         heuristics += [abs(position[0] - coord[0]) + abs(position[1] - coord[1])]
     if heuristics:
-        return max(heuristics)
-    return 0
+        BonusIfFood(foodGrid, position)
+        return max(heuristics) + BonusIfFood(foodGrid, position)
+
+def BonusIfFood(foodGrid, position):
+    # print(position[0])
+    # print(position[1])
+    # print(foodGrid[position[0]][position[1]])
+    # if foodGrid[position[0]][position[1]]:
+    #     print("Sumo 1")
+    # else:
+    #     print("Sumo 0")
+    # print(len(foodGrid.asList()))
+    return 0 if foodGrid[position[0]][position[1]] else 1
 
 
 class ClosestDotSearchAgent(SearchAgent):
