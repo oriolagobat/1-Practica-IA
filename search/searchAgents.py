@@ -393,6 +393,7 @@ def cornersHeuristic(state, problem):
     return 0
 
 
+
 def updateIncrements(position, corner):
     if position < corner:
         incr = 1
@@ -471,7 +472,7 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchType = FoodSearchProblem
 
 
-def foodHeuristic(state, problem):
+def foodHeuristic(state, problem = FoodSearchProblem):
     """
     Your heuristic for the FoodSearchProblem goes here.
 
@@ -500,7 +501,13 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
+    if problem.isGoalState(state):
+        return 0
+    heuristics = []
+    for coord in foodGrid:
+        heuristics += [abs(position[0] - coord[0]) + abs(position[1] - coord[1])]
+    if heuristics:
+        return max(heuristics)
     return 0
 
 
