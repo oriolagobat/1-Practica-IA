@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -111,7 +111,8 @@ def breadthFirstSearch(problem: SearchProblem):
     fringe.push(initial)
     generated = set()
     generated.add(initial.state)  # Expanded,
-    # Ho posem aquí perque aquesta línia és només útil pel primer node, si no estaria després del pop
+    # Ho posem aquí perque aquesta línia és només útil pel primer node,
+    # si no estaria després del pop
 
     while not fringe.isEmpty():
         n = fringe.pop()
@@ -165,7 +166,8 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
             if succ_node.state not in generated:
                 fringe.push(succ_node, succ_node.cost + heuristic(state, problem))
                 generated[succ_node.state] = ("F", succ_node.cost)
-            elif generated[succ_node.state][0] == 'F' and generated[succ_node.state][1] > succ_node.cost:
+            elif generated[succ_node.state][0] == 'F' \
+                    and generated[succ_node.state][1] > succ_node.cost:
                 fringe.update(succ_node, succ_node.cost)
                 generated[succ_node.state] = ("F", succ_node.cost)
 
