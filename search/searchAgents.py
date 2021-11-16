@@ -33,6 +33,7 @@ description for details.
 
 Good luck and happy searching!
 """
+import sys
 
 from game import Directions
 from game import Agent
@@ -380,21 +381,29 @@ def cornersHeuristic(state, problem):
     admissible (as well as consistent).
     """
     corners = problem.corners  # These are the corner coordinates
-    walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
+    position, visited = state
+    list_visited = list(visited)
+    src_pos = position
 
-    if problem.isGoalState(state):
+    min_coords = (0, 0)
+    total = 0
+
+    if len(visited) == len(corners):  # Per a que retorni 0 en el test objectiu
         return 0
 
-    heuristics = []
-    position, visited = state
-    new_pos = list(position)
-    for corner in corners:
-        if corner not in visited:  # Ens falta aquest corner
-            heuristics += [abs(position[0] - corner[0]) + abs(position[1] - corner[1])]
-    if heuristics:
-        return max(heuristics) + (len(corners) - len(visited))
-        # return max(heuristics)
-    return 0
+    while len(list_visited) <= len(corners):
+        minim = sys.maxsize
+        for corner in corners:
+            if corner not in list_visited:
+                cost = abs(src_pos[0] - corner[0]) + abs(src_pos[1] - corner[1])
+                if cost < minim:
+                    minim = cost
+                    min_coords = corner
+        list_visited += [min_coords]
+        total += minim
+        src_pos = min_coords
+
+    return total
 
 
 def updateIncrements(position, corner):
@@ -475,7 +484,7 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchType = FoodSearchProblem
 
 
-def foodHeuristic(state, problem=FoodSearchProblem):
+def foodHeuristic(state, problem = FoodSearchProblem):
     """
     Your heuristic for the FoodSearchProblem goes here.
 
@@ -504,13 +513,41 @@ def foodHeuristic(state, problem=FoodSearchProblem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    if problem.isGoalState(state):
+    remaining_food = foodGrid.asList()
+    src_pos = position
+
+    min_coords = (0, 0)
+    total = 0
+
+    if not remaining_food:  # Per a que retorni 0 en el test objectiu
         return 0
-    heuristics = []
-    for coord in foodGrid.asList():
-        heuristics += [abs(position[0] - coord[0]) + abs(position[1] - coord[1])]
-    if heuristics:
-        return max(heuristics)
+
+    while len(remaining_food) > 0:
+        minim = sys.maxsize
+        for food in remaining_food:
+            cost = abs(src_pos[0] - food[0]) + abs(src_pos[1] - food[1])
+            if cost < minim:
+                minim = cost
+                min_coords = food
+        remaining_food.remove(min_coords) # FALTA AIXO FER QUE SE TREGUI DE LA LLISTA
+        total += minim
+        src_pos = min_coords
+
+    return total
+
+
+def BonusIfFood(foodGrid, position):
+    # print(position[0])
+    # print(position[1])
+    # print(foodGrid[position[0]][position[1]])
+    # if foodGrid[position[0]][position[1]]:
+    #     print("Sumo 1")
+    # else:
+    #     print("Sumo 0")
+    # print(len(foodGrid.asList()))
+    # print(foodGrid[position[0]][position[1]], file=sys.stderr)
+    return 0 if foodGrid[position[0]][position[1]] == "T" else 1
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -577,7 +614,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         """
         x, y = state
 
-        return self.food[state[0]][state[1]]
+        return self.food[x][y]
 
 
 def mazeDistance(point1, point2, gameState):
