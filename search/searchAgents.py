@@ -326,8 +326,10 @@ class CornersProblem(search.SearchProblem):
 
         Per totes les possibles accions que existeixen (les 4 direccions Nord sud etc)
         comprovem si xocaria contra un muro en aplicarla, si no xoca construim una nova tupla
-        construida per [ el successor (la nova posició, la llista de corners que ja teniem més (si es que amb el
-        nou moviment anem a parar a un corner que no hem visitat) el corner que visitarem), l'accoó, el cost del pas.
+        construida per [ el successor (la nova posició,
+         la llista de corners que ja teniem més
+         (si es que amb el nou moviment anem a parar a un corner que no hem visitat)
+          el corner que visitarem), l'acció, el cost del pas.
         """
 
         cur_pos, corners = state
@@ -529,27 +531,25 @@ def foodHeuristic(state, problem=FoodSearchProblem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+
+    # Obtenemos paramétros iniciales i lista de la comida que nos falta por comer
     position, foodGrid = state
     food_list = foodGrid.asList()
+
+    # Si nos encontramos en el estado objectivo, retornamos cero
     if problem.isGoalState(state):
         return 0
+
+    # Alternativamente, por cada ítem de comida que no hemos comido aún,
+    # calculamos la distáncia de Manhattan hasta este, metiendolas en una lista
     heuristics = []
     for food in food_list:
         heuristics += [abs(position[0] - food[0]) + abs(position[1] - food[1])]
+
+    # Retornamos el máximo de las distàncias de la lista (asegurando admisibilidad y consistencia),
+    # sumado a la cantidad de comida que nos quedaria en esta posición, para dar un pequeño empujón
+    # a aquellas casillas que nos acercarian mas al objetivo
     return max(heuristics) + len(food_list)
-
-
-def BonusIfFood(foodGrid, position):
-    # print(position[0])
-    # print(position[1])
-    # print(foodGrid[position[0]][position[1]])
-    # if foodGrid[position[0]][position[1]]:
-    #     print("Sumo 1")
-    # else:
-    #     print("Sumo 0")
-    # print(len(foodGrid.asList()))
-    # print(foodGrid[position[0]][position[1]], file=sys.stderr)
-    return 0 if foodGrid[position[0]][position[1]] == "T" else 1
 
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -576,11 +576,9 @@ class ClosestDotSearchAgent(SearchAgent):
         gameState.
         """
         # Here are some useful elements of the startState
-        startPosition = gameState.getPacmanPosition()
-        food = gameState.getFood()
-        walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
+        # Retornamos la búsqueda en bfs del problema obtenido
         return search.bfs(problem)
 
 
@@ -617,6 +615,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         """
         x, y = state
 
+        # Retornamos cierto si la casilla correspondiente al estado tiene comida,
+        # falso alternativamente
         return self.food[x][y]
 
 
