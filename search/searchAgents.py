@@ -310,8 +310,9 @@ class CornersProblem(search.SearchProblem):
         """
         Returns whether this search state is a goal state of the problem.
         """
+        # El test objetivo es mirar si hemos visitado todas las esquinas ya
         _, corners = state
-        return len(corners) == len(self.corners)  # Es com dir == 4
+        return len(corners) == len(self.corners)
 
     def getSuccessors(self, state):
         """
@@ -332,6 +333,7 @@ class CornersProblem(search.SearchProblem):
         cur_pos, corners = state
         x, y = cur_pos
 
+        # Generamos sucesores
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             dx, dy = Actions.directionToVector(action)
@@ -345,7 +347,7 @@ class CornersProblem(search.SearchProblem):
 
                 for c in self.corners:
                     if c == new_pos:
-                        new_corners.add(c)  # Ho fem en un conjunt així ni que estigui a dins no el posem per duplicat
+                        new_corners.add(c)  # Es un conjunto para no meter duplicados
                         break
 
                 succ = (new_pos, frozenset(new_corners))
@@ -358,7 +360,7 @@ class CornersProblem(search.SearchProblem):
         Returns the cost of a particular sequence of actions.  If those actions
         include an illegal move, return 999999.  This is implemented for you.
         """
-        if actions == None: return 999999
+        if actions is None: return sys.maxsize
         x, y = self.startingPosition
         for action in actions:
             dx, dy = Actions.directionToVector(action)
@@ -380,29 +382,44 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
+    # Obtenemos parámetros del estado y pasamos las esquinas visitadas a una lista
     corners = problem.corners  # These are the corner coordinates
     position, visited = state
     list_visited = list(visited)
     src_pos = position
 
-    min_coords = (0, 0)
+    # Inicializamos las coordenadas del minimo y el total
+    min_coords = (None, None)
     total = 0
 
-    if len(visited) == len(corners):  # Per a que retorni 0 en el test objectiu
+    # Si ya hemos visitado todas las esquinas retornamos cero, ya que es el objetivo
+    if len(visited) == len(corners):
         return 0
 
+    # Miramos la menor de todas las distancias de Manhattan
     while len(list_visited) <= len(corners):
+        # Inicializamos en cada vuelta el minimo a el nombre mas alto posible,
+        # para que el mínimos con este de siempre el otro número
         minim = sys.maxsize
+
+        # Recorremos cada esquina, y nos centramos en las no visitadas
         for corner in corners:
             if corner not in list_visited:
                 cost = abs(src_pos[0] - corner[0]) + abs(src_pos[1] - corner[1])
+
+                # Si el coste encontrado es menor que el que tenemos almacenado,
+                # actualizamos este coste
                 if cost < minim:
                     minim = cost
                     min_coords = corner
+
+        # Finalmente, en cada vuelta de la iteración,
+        # actualizamos las coordenadas y el coste total de la heurística
         list_visited += [min_coords]
         total += minim
         src_pos = min_coords
 
+    # Retornamos el total
     return total
 
 
@@ -484,7 +501,7 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchType = FoodSearchProblem
 
 
-def foodHeuristic(state, problem = FoodSearchProblem):
+def foodHeuristic(state, problem=FoodSearchProblem):
     """
     Your heuristic for the FoodSearchProblem goes here.
 
@@ -513,27 +530,13 @@ def foodHeuristic(state, problem = FoodSearchProblem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    remaining_food = foodGrid.asList()
-    src_pos = position
-
-    min_coords = (0, 0)
-    total = 0
-
-    if not remaining_food:  # Per a que retorni 0 en el test objectiu
+    food_list = foodGrid.asList()
+    if problem.isGoalState(state):
         return 0
-
-    while len(remaining_food) > 0:
-        minim = sys.maxsize
-        for food in remaining_food:
-            cost = abs(src_pos[0] - food[0]) + abs(src_pos[1] - food[1])
-            if cost < minim:
-                minim = cost
-                min_coords = food
-        remaining_food.remove(min_coords) # FALTA AIXO FER QUE SE TREGUI DE LA LLISTA
-        total += minim
-        src_pos = min_coords
-
-    return total
+    heuristics = []
+    for food in food_list:
+        heuristics += [abs(position[0] - food[0]) + abs(position[1] - food[1])]
+    return max(heuristics) + len(food_list)
 
 
 def BonusIfFood(foodGrid, position):
