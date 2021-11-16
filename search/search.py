@@ -168,7 +168,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
         return initial.total_path()
 
     # Cargamos nodo incial en fringe i generated
-    fringe = util.NodePriorityQueue()
+    fringe = util.PriorityQueue()
     generated = {}
     fringe.push(initial, 0)
     generated[initial.state] = ("F", 0 + heuristic(initial.state, problem))
