@@ -153,30 +153,6 @@ class Stack:
         return len(self.list) == 0
 
 
-class NodeStack(Stack):
-    "A container with a last-in-first-out (LIFO) queuing policy for nodes."
-
-    def __init__(self):
-        super().__init__()
-
-    def __contains__(self, item):
-        for x in self.list:
-            if x == item:
-                return True
-        return False
-
-    def has_state(self, state):
-        for node in self.list:
-            if node.state == state:
-                return True
-        return False
-
-    def get_state_cost(self, state):
-        for node in self.list:
-            if node.state == state:
-                return node.cost
-
-
 class Queue:
     "A container with a first-in-first-out (FIFO) queuing policy."
 
@@ -197,30 +173,6 @@ class Queue:
     def isEmpty(self):
         "Returns true if the queue is empty"
         return len(self.list) == 0
-
-
-class NodeQueue(Queue):
-    "A container with a first-in-first-out (FIFO) queuing policy for nodes."
-
-    def __init__(self):
-        super().__init__()
-
-    def __contains__(self, item):
-        for x in self.list:
-            if x == item:
-                return True
-        return False
-
-    def has_state(self, state):
-        for node in self.list:
-            if node.state == state:
-                return True
-        return False
-
-    def get_state_cost(self, state):
-        for node in self.list:
-            if node.state == state:
-                return node.cost
 
 
 class PriorityQueue:
@@ -263,38 +215,6 @@ class PriorityQueue:
             self.push(item, priority)
 
 
-class NodePriorityQueue(PriorityQueue):
-    """
-      Implements a priority queue data structure for nodes.
-    """
-
-    def __init__(self):
-        super().__init__()
-
-    def __contains__(self, item):
-        for _, _, node in self.heap:
-            if node == item:
-                return True
-        return False
-
-    def has_state(self, state):
-        for _, _, node in self.heap:
-            if node.state == state:
-                return True
-        return False
-
-    def get_state_cost(self, state):
-        for _, _, node in self.heap:
-            if node.state == state:
-                return node.cost
-
-    def has_node_with_higher_cost(self, item):
-        for _, _, node in self.heap:
-            if node.state == item.state and node.cost > item.cost:
-                return True
-        return False
-
-
 class PriorityQueueWithFunction(PriorityQueue):
     """
     Implements a priority queue with the same push/pop signature of the
@@ -311,41 +231,6 @@ class PriorityQueueWithFunction(PriorityQueue):
     def push(self, item):
         "Adds an item to the queue with priority from the priority function"
         PriorityQueue.push(self, item, self.priorityFunction(item))
-
-
-class NodePriorityQueueWithFunction(PriorityQueueWithFunction):
-    """
-    Implements a priority queue with the same push/pop signature of the
-    Queue and the Stack classes. This is designed for drop-in replacement for
-    those two classes. The caller has to provide a priority function, which
-    extracts each item's priority.
-    """
-
-    def __init__(self, priorityFunction):
-        super().__init__(priorityFunction)
-
-    def __contains__(self, item):
-        for _, _, node in self.heap:
-            if node == item:
-                return True
-        return False
-
-    def has_state(self, state):
-        for _, _, node in self.heap:
-            if node.state == state:
-                return True
-        return False
-
-    def get_state_cost(self, state):
-        for _, _, node in self.heap:
-            if node.state == state:
-                return node.cost
-
-    def has_node_with_higher_cost(self, item):
-        for _, _, node in self.heap:
-            if node.state == item.state and node.cost > item.cost:
-                return True
-        return False
 
 
 def manhattanDistance(xy1, xy2):

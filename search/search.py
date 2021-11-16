@@ -17,8 +17,8 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
-import util
 import sys
+import util
 from node import Node
 
 
@@ -78,59 +78,77 @@ def tinyMazeSearch(problem):
 
 def depthFirstSearch(problem):
     """Search the deepest nodes in the search tree first."""
+    # Creamos y miramos si el nodo incial es objetivo
     initial = Node(problem.getStartState())
     if problem.isGoalState(problem.getStartState()):
         return initial.total_path()
 
+    # Cargamos nodo incial en fringe i generated
     fringe = util.Stack()
     fringe.push(initial)
     generated = set()
     generated.add(initial.state)
 
+    # Entramos en bucle que va sacando nodos de fringe
+    # hasta que no este vacio o no se encuentre solución
     while not fringe.isEmpty():
         n = fringe.pop()
+
+        # Generamos sucesores
         for state, action, cost in problem.getSuccessors(n.state):
             succ_node = Node(state, n, action, n.cost + cost)
             if succ_node.state not in generated:
+                # Miramos test objectivo
                 if problem.isGoalState(succ_node.state):
                     return succ_node.total_path()
+
+                # Si no es objetivo, ponemos nodo en fringe y en generated
                 fringe.push(succ_node)
                 generated.add(succ_node.state)
 
+    # Si no hemos encontrado solucion, imprimimos y salimos
     print("No solution")
     sys.exit(-1)
 
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
+    # Creamos y miramos si el nodo incial es objetivo
     initial = Node(problem.getStartState())
     if problem.isGoalState(problem.getStartState()):
         return initial.total_path()
 
+    # Cargamos nodo incial en fringe i generated
     fringe = util.Queue()
     fringe.push(initial)
     generated = set()
-    generated.add(initial.state)  # Expanded,
-    # Ho posem aquí perque aquesta línia és només útil pel primer node,
-    # si no estaria després del pop
+    generated.add(initial.state)
 
+    # Entramos en bucle que va sacando nodos de fringe
+    # hasta que no este vacio o no se encuentre solución
     while not fringe.isEmpty():
         n = fringe.pop()
 
+        # Generamos sucesores
         for state, action, cost in problem.getSuccessors(n.state):
             succ_node = Node(state, n, action, n.cost + cost)
             if succ_node.state not in generated:  # Not in expanded and not in Fringe
                 if problem.isGoalState(succ_node.state):
                     return succ_node.total_path()
+
+                # Si no es objetivo, ponemos nodo en fringe y en generated
                 fringe.push(succ_node)
                 generated.add(succ_node.state)  # Fringe
 
+    # Si no hemos encontrado solucion, imprimimos y salimos
     print("No solution")
     sys.exit(-1)
 
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
+    # Retornamos el valor de la búsqueda de astar sin especificar heurísticament,
+    # puesto que la predefinida es la heurística nula (UCS)
     return aStarSearch(problem)
 
 
@@ -144,33 +162,49 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
+    # Creamos y miramos si el nodo incial es objetivo
     initial = Node(problem.getStartState())
     if problem.isGoalState(problem.getStartState()):
         return initial.total_path()
 
+    # Cargamos nodo incial en fringe i generated
     fringe = util.NodePriorityQueue()
     generated = {}
     fringe.push(initial, 0)
     generated[initial.state] = ("F", 0 + heuristic(initial.state, problem))
 
+    # Entramos en bucle que va sacando nodos de fringe
+    # hasta que no este vacio o no se encuentre solución
     while not fringe.isEmpty():
         n = fringe.pop()
+
+        # Test en sacar del frigne
         if problem.isGoalState(n.state):
             return n.total_path()
+
+        # Si ya hemos expandido nodo, pasamos a la siguiente iteración
         if generated[n.state][0] == "E":
-            # Passa a la següent iteració del bucle
             continue
+
+        # Alternativamente, canviamos el estado del nodo a generado
         generated[n.state] = ("E", n.cost)
+
+        # Bucle de generación de sucesores
         for state, action, cost in problem.getSuccessors(n.state):
             succ_node = Node(state, n, action, n.cost + cost)
+
+            # Si no lo hemos generado, lo metemos en fringe
             if succ_node.state not in generated:
                 fringe.push(succ_node, succ_node.cost + heuristic(state, problem))
                 generated[succ_node.state] = ("F", succ_node.cost)
+
+            # Si está en fringe pero tiene un coste mayor, actualizamos su coste al menor
             elif generated[succ_node.state][0] == 'F' \
                     and generated[succ_node.state][1] > succ_node.cost:
                 fringe.update(succ_node, succ_node.cost)
                 generated[succ_node.state] = ("F", succ_node.cost)
 
+    # Si no hemos encontrado solucion, imprimimos y salimos
     print("No solution")
     sys.exit(-1)
 
