@@ -547,9 +547,7 @@ def foodHeuristic(state, problem=FoodSearchProblem):
         heuristics += [abs(position[0] - food[0]) + abs(position[1] - food[1])]
 
     # Retornamos el máximo de las distàncias de la lista (asegurando admisibilidad y consistencia),
-    # sumado a la cantidad de comida que nos quedaria en esta posición, para dar un pequeño empujón
-    # a aquellas casillas que nos acercarian mas al objetivo
-    return max(heuristics) + len(food_list)
+    return max(heuristics)
 
 
 class ClosestDotSearchAgent(SearchAgent):
